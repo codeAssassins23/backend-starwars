@@ -10,4 +10,5 @@ export interface IEnviroments {
     ssl: boolean;
     synchronize: boolean;
   };
+  swapiApiUrl: string;
 }

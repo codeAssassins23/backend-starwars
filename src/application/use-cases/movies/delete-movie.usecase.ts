@@ -3,13 +3,12 @@ import type { MovieRepositoryPort } from 'src/domain/ports/repository/movie.repo
 import { TOKENS } from 'src/domain/tokens/tokens';
 
 @Injectable()
-export class GetMoviesUseCase {
+export class DeleteMovieUseCase {
   constructor(
     @Inject(TOKENS.MOVIE_REPOSITORY)
     private readonly movieRepo: MovieRepositoryPort,
   ) {}
-
-  async execute() {
-    return await this.movieRepo.findAll();
+  async execute(id: string): Promise<void> {
+    return await this.movieRepo.delete(id);
   }
 }

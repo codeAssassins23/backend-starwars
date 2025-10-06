@@ -8,6 +8,7 @@ interface EnvVars {
   SYNCHRONIZE: boolean;
   NODE_ENV: string;
   SECRET_ACCESS: string;
+  SWAPI_API_URL: string;
 }
 
 const envsSchema = joi
@@ -17,6 +18,7 @@ const envsSchema = joi
     SYNCHRONIZE: joi.boolean().required(),
     NODE_ENV: joi.string().required(),
     SECRET_ACCESS: joi.string().required(),
+    SWAPI_API_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -68,4 +70,5 @@ export const envs: IEnviroments = {
     ssl: envVars.DATABASE_SSL,
     synchronize: envVars.SYNCHRONIZE,
   },
+  swapiApiUrl: envVars.SWAPI_API_URL,
 };
