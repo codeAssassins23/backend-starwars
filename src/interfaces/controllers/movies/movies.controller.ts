@@ -77,6 +77,7 @@ export class MoviesController {
 
   @Put('/:id')
   @Roles('admin')
+  @ApiResponseType(MovieResponsePresenter, false)
   async updateMovie(@Param('id') id: string, @Body() body: UpdateMovieDto) {
     const movieUpdate = await this.updateMovieUseCase.execute(id, body);
     return new MovieResponsePresenter(movieUpdate);
