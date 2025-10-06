@@ -1,6 +1,6 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
-import type { MovieRepositoryPort } from 'src/domain/ports/repository/movie.repository.port';
-import { TOKENS } from 'src/domain/tokens/tokens';
+import { Inject, Injectable } from '@nestjs/common';
+import type { MovieRepositoryPort } from '../../../domain/ports/repository/movie.repository.port';
+import { TOKENS } from '../../../domain/tokens/tokens';
 
 @Injectable()
 export class GetMovieUseCase {

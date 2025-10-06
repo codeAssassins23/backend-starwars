@@ -9,21 +9,21 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/interfaces/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/interfaces/guards/roles.guard';
-import { Roles } from 'src/interfaces/decorators/roles.decorator';
-import { TOKENS } from 'src/domain/tokens/tokens';
-import { GetMoviesUseCase } from 'src/application/use-cases/movies/get-movies.usecase';
-import { SyncMoviesUseCase } from 'src/application/use-cases/movies/sync-movies.usecase';
-import { GetMovieUseCase } from 'src/application/use-cases/movies/get-movie.usecase';
+import { JwtAuthGuard } from '../../../interfaces/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../interfaces/guards/roles.guard';
+import { Roles } from '../../../interfaces/decorators/roles.decorator';
+import { TOKENS } from '../../../domain/tokens/tokens';
+import { GetMoviesUseCase } from '../../../application/use-cases/movies/get-movies.usecase';
+import { SyncMoviesUseCase } from '../../../application/use-cases/movies/sync-movies.usecase';
+import { GetMovieUseCase } from '../../../application/use-cases/movies/get-movie.usecase';
 import { MovieDto } from './dto/movie.dto';
 import { ApiExtraModels } from '@nestjs/swagger';
-import { ApiResponseType } from 'src/infrastructure/config/swagger/response.decorator';
+import { ApiResponseType } from '../../../infrastructure/config/swagger/response.decorator';
 import { MovieResponsePresenter } from './presenters/movie.presenter';
 import { MoviesResponsePresenter } from './presenters/get-movies.presenter';
-import { CreateMovieUseCase } from 'src/application/use-cases/movies/create-movie.usecase';
-import { UpdateMovieUseCase } from 'src/application/use-cases/movies/update-movie.usecase';
-import { DeleteMovieUseCase } from 'src/application/use-cases/movies/delete-movie.usecase';
+import { CreateMovieUseCase } from '../../../application/use-cases/movies/create-movie.usecase';
+import { UpdateMovieUseCase } from '../../../application/use-cases/movies/update-movie.usecase';
+import { DeleteMovieUseCase } from '../../../application/use-cases/movies/delete-movie.usecase';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Controller('movies')

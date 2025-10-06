@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Movie } from 'src/domain/entities/movie.entity';
-import type { MovieRepositoryPort } from 'src/domain/ports/repository/movie.repository.port';
-import { TOKENS } from 'src/domain/tokens/tokens';
+import { Movie } from '../../../domain/entities/movie.entity';
+import type { MovieRepositoryPort } from '../../../domain/ports/repository/movie.repository.port';
+import { TOKENS } from '../../../domain/tokens/tokens';
 
 @Injectable()
 export class UpdateMovieUseCase {

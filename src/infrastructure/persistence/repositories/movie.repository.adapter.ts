@@ -6,8 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MovieEntity } from '../entities/movie.entity';
-import { Movie } from 'src/domain/entities/movie.entity';
-import { MovieRepositoryPort } from 'src/domain/ports/repository/movie.repository.port';
+import { Movie } from '../../../domain/entities/movie.entity';
+import { MovieRepositoryPort } from '../../../domain/ports/repository/movie.repository.port';
 
 @Injectable()
 export class TypeormMovieRepositoryAdapter implements MovieRepositoryPort {

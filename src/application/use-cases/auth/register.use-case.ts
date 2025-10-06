@@ -1,8 +1,7 @@
 import { Injectable, ConflictException, Inject } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import type { UserRepositoryPort } from '../../../domain/ports/repository/user.repository.port';
 import { User } from '../../../domain/entities/user.entity';
-import { TOKENS } from 'src/domain/tokens/tokens';
+import { TOKENS } from '../../../domain/tokens/tokens';
 import type { EncryptionServicePort } from 'src/domain/ports/services/encryption.service.port';
 
 @Injectable()

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { Movie } from 'src/domain/entities/movie.entity';
-import { SwapiServicePort } from 'src/domain/ports/external_services/get-movies.swapi';
-import { envs } from 'src/infrastructure/config/environments/envs';
+import { Movie } from '../../../domain/entities/movie.entity';
+import { SwapiServicePort } from '../../../domain/ports/external_services/get-movies.swapi';
+import { envs } from '../../../infrastructure/config/environments/envs';
 
 @Injectable()
 export class SwapiService implements SwapiServicePort {

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Inject } from '@nestjs/common';
-import { LoginUseCase } from 'src/application/use-cases/auth/login.usecase';
-import { RegisterUseCase } from 'src/application/use-cases/auth/register.use-case';
-import { TOKENS } from 'src/domain/tokens/tokens';
+import { LoginUseCase } from '../../../application/use-cases/auth/login.usecase';
+import { RegisterUseCase } from '../../../application/use-cases/auth/register.use-case';
+import { TOKENS } from '../../../domain/tokens/tokens';
 
 @Controller('auth')
 export class AuthController {
