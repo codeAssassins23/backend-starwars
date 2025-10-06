@@ -13,10 +13,11 @@ import { GetMovieUseCase } from 'src/application/use-cases/movies/get-movie.usec
 import { CreateMovieUseCase } from 'src/application/use-cases/movies/create-movie.usecase';
 import { UpdateMovieUseCase } from 'src/application/use-cases/movies/update-movie.usecase';
 import { DeleteMovieUseCase } from 'src/application/use-cases/movies/delete-movie.usecase';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [UseCasesModule, AdaptersModule, ExternalServicesModule],
-  controllers: [MoviesController, AuthController],
+  controllers: [MoviesController, AuthController, HealthController],
   providers: [
     {
       provide: TOKENS.LOGIN_USE_CASE,
