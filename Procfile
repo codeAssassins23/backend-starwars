@@ -1,1 +1,1 @@
-web: npm run start:prod
+'prestart:prod': 'npm run build && node dist/main.js'
