@@ -54,7 +54,7 @@ export class MoviesController {
   }
 
   @Get('/:id')
-  @Roles('user', 'admin')
+  @Roles('user')
   @ApiResponseType(MovieResponsePresenter, false)
   async getAdminMovies(@Param('id') id: string) {
     const movie = await this.getMovieUseCase.execute(id);
