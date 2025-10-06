@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtServicePort } from '../../../domain/ports/jwt.service.port';
+import { JwtServicePort } from '../../../domain/ports/services/jwt.service.port';
 
 @Injectable()
 export class JwtServiceAdapter implements JwtServicePort {

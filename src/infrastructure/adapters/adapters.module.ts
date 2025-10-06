@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtServiceAdapter } from '../adapters/jwt/jwt.service.adapter';
-import { TOKENS } from 'src/domain/tokens/tokens';
 import { BcryptServiceAdapter } from './encryption/bcrypt.service.adapter';
 
 @Module({
