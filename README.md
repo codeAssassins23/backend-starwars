@@ -1,48 +1,66 @@
-# 🎬 Star Wars Movies Management API
+# Star Wars Movies Management API
 
 Backend desarrollado en NestJS para la gestión de películas utilizando la API pública de Star Wars (SWAPI), implementado como parte del reto técnico de Conexa.
 
-## 📋 Descripción
+## Descripción
 
 Sistema de gestión de películas con autenticación JWT, roles de usuario (Regular/Administrador) y sincronización automática con la API de Star Wars. El proyecto implementa arquitectura hexagonal (Clean Architecture) con separación clara de responsabilidades.
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 El proyecto sigue los principios de **Clean Architecture** con la siguiente estructura:
 
 ```
 src/
-├── domain/              # Lógica de negocio pura
-│   ├── entities/        # Entidades del dominio
-│   ├── ports/           # Interfaces/Contratos
-│   └── interfaces/      # Tipos e interfaces compartidas
-├── application/         # Casos de uso
-│   ├── use-cases/       # Lógica de aplicación
-│   └── services/        # Servicios de aplicación
-├── infrastructure/      # Detalles de implementación
-│   ├── adapters/        # Implementaciones de puertos
-│   ├── config/          # Configuración
-│   ├── persistence/     # Base de datos (TypeORM)
-│   └── external_services/ # Integraciones externas (SWAPI, Cron)
-└── interfaces/          # Capa de presentación
-    ├── controllers/     # Controladores REST
-    ├── dto/             # Data Transfer Objects
-    ├── guards/          # Guards de autenticación/autorización
-    ├── interceptors/    # Interceptores
-    └── filters/         # Filtros de excepciones
+├── application/              # Capa de Aplicación
+│   └── use-cases/           # Casos de uso
+│       ├── auth/            # Autenticación
+│       └── movies/          # Gestión de películas
+│
+├── domain/                   # Capa de Dominio
+│   ├── entities/            # Entidades del dominio
+│   ├── interfaces/          # Interfaces de dominio
+│   ├── ports/               # Puertos (interfaces de adaptadores)
+│   │   ├── external_services/
+│   │   ├── repository/
+│   │   └── services/
+│   └── tokens/              # Tokens de inyección
+│
+├── infrastructure/           # Capa de Infraestructura
+│   ├── adapters/            # Adaptadores (JWT, Bcrypt)
+│   ├── config/              # Configuración
+│   │   ├── environments/
+│   │   ├── logger/
+│   │   ├── swagger/
+│   │   └── typeorm/
+│   ├── external_services/   # Servicios externos
+│   │   ├── cron-swapi/     # Tareas programadas
+│   │   └── swapi/          # Cliente SWAPI
+│   └── persistence/         # Persistencia de datos
+│       ├── entities/        # Entidades TypeORM
+│       └── repositories/    # Repositorios
+│
+└── interfaces/               # Capa de Interfaces
+    ├── controllers/         # Controladores HTTP
+    │   ├── auth/
+    │   └── movies/
+    ├── decorators/          # Decoradores personalizados
+    ├── filter/              # Filtros de excepción
+    ├── guards/              # Guards de autenticación
+    └── interceptors/        # Interceptores de respuesta
 ```
 
-## ✨ Características
+## Características
 
-- 🔐 **Autenticación JWT** con roles (Regular User/Admin)
-- 👥 **Gestión de usuarios** (registro e inicio de sesión)
-- 🎬 **CRUD completo de películas** con control de acceso basado en roles
-- 🤖 **Sincronización automática** con SWAPI mediante cron jobs
-- 📚 **Documentación Swagger** integrada
-- ✅ **Testing** unitario y e2e
-- 🛡️ **Validación de datos** con class-validator
-- 🔍 **Logging personalizado** para debugging
-- 🎨 **Arquitectura limpia** y escalable
+- **Autenticación JWT** con roles (Regular User/Admin)
+- **Gestión de usuarios** (registro e inicio de sesión)
+- **CRUD completo de películas** con control de acceso basado en roles
+- **Sincronización automática** con SWAPI mediante cron jobs
+- **Documentación Swagger** integrada
+- **Testing** unitario y e2e
+- **Validación de datos** con class-validator
+- **Logging personalizado** para debugging
+- **Arquitectura limpia** y escalable
 
 ## 🚀 Tecnologías
 
@@ -59,9 +77,9 @@ src/
 
 ### Requisitos previos
 
-- Node.js >= 18.x
+- Node.js >= 22.x
 - PostgreSQL >= 14.x
-- npm o yarn
+- npm
 
 ### Pasos
 
@@ -139,9 +157,6 @@ npm run start:prod
 # Tests unitarios
 npm run test
 
-# Tests e2e
-npm run test:e2e
-
 # Cobertura
 npm run test:cov
 ```
@@ -153,22 +168,22 @@ npm run lint
 npm run format
 ```
 
-## 📖 Documentación API
+## Documentación API
 
 Una vez iniciada la aplicación, accede a la documentación Swagger en:
 
 ```
-http://localhost:3000/api/docs
+http://localhost:3000/api
 ```
 
 ### Endpoints principales
 
-#### 🔐 Autenticación
+#### Autenticación
 
 - **POST** `/auth/register` - Registro de usuario
 - **POST** `/auth/login` - Inicio de sesión
 
-#### 🎬 Películas
+#### Películas
 
 - **GET** `/movies` - Listar películas (Requiere autenticación)
 - **GET** `/movies/:id` - Obtener película por ID (Solo usuarios regulares)
@@ -185,10 +200,8 @@ http://localhost:3000/api/docs
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@example.com",
-    "password": "Password123!",
-    "name": "Admin User",
-    "role": "admin"
+    "username": "admin2",
+    "password": "force123"
   }'
 ```
 
@@ -198,8 +211,8 @@ curl -X POST http://localhost:3000/auth/register \
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@example.com",
-    "password": "Password123!"
+    "username": "admin2",
+    "password": "force123"
   }'
 ```
 
@@ -210,29 +223,28 @@ curl -X GET http://localhost:3000/movies \
   -H "Authorization: Bearer <tu_token_jwt>"
 ```
 
-## 🔑 Roles y Permisos
+## Roles y Permisos
 
 | Acción                  | Usuario Regular | Administrador |
 | ----------------------- | --------------- | ------------- |
 | Ver lista de películas  | ✅              | ✅            |
-| Ver detalle de película | ✅              | ✅            |
+| Ver detalle de película | ✅              | ❌            |
 | Crear película          | ❌              | ✅            |
 | Actualizar película     | ❌              | ✅            |
 | Eliminar película       | ❌              | ✅            |
 | Sincronizar con SWAPI   | ❌              | ✅            |
 
-## 🤖 Sincronización Automática
+## Sincronización Automática
 
-El sistema incluye un cron job que sincroniza automáticamente las películas de Star Wars cada hora. Esta funcionalidad puede deshabilitarse estableciendo `ENABLE_CRON=false` en el archivo `.env`.
+El sistema incluye un cron job que sincroniza automáticamente las películas de Star Wars cada hora.
 
-## 🧪 Testing
+## Testing
 
 El proyecto incluye:
 
-- ✅ Tests unitarios para servicios y casos de uso
-- ✅ Tests de integración para repositorios
-- ✅ Tests e2e para endpoints
-- ✅ Tests para guards, interceptors y filters
+- Tests unitarios para servicios y casos de uso
+- Tests de integración para repositorios
+- Tests para guards, interceptors y filters
 
 ```bash
 # Ejecutar todos los tests
@@ -242,45 +254,26 @@ npm test
 npm run test:cov
 ```
 
-## 📂 Estructura de Base de Datos
+## Estructura de Base de Datos
 
 ### Tabla `users`
 
-- `id` (UUID)
-- `email` (string, único)
+- `id` (number)
+- `username` (string, único)
 - `password` (string, hasheado)
-- `name` (string)
 - `role` (enum: 'user' | 'admin')
-- `createdAt` (timestamp)
-- `updatedAt` (timestamp)
+- `status` (boolean)
 
 ### Tabla `movies`
 
 - `id` (UUID)
 - `title` (string)
-- `episodeId` (number)
-- `openingCrawl` (text)
 - `director` (string)
 - `producer` (string)
-- `releaseDate` (date)
-- `url` (string)
-- `createdAt` (timestamp)
-- `updatedAt` (timestamp)
+- `releaseDate` (string)
+- `status` (boolean)
 
-## 🚀 Deployment
-
-### Opciones sugeridas (gratuitas):
-
-- **Railway** (recomendado)
-- **Render**
-- **Fly.io**
-- **Heroku** (con PostgreSQL addon)
-
-### Variables de entorno para producción:
-
-Asegúrate de configurar todas las variables del `.env` en tu plataforma de deployment.
-
-## 🤝 Contribución
+## Contribución
 
 Este es un proyecto de prueba técnica. Para el uso real, considera:
 
@@ -288,24 +281,18 @@ Este es un proyecto de prueba técnica. Para el uso real, considera:
 2. Agregar paginación en endpoints
 3. Implementar caché (Redis)
 4. Agregar logs más robustos (Winston, Pino)
-5. Implementar health checks
-6. Agregar más tests
 
-## 📝 Notas del Desarrollador
+## Notas del Desarrollador
 
-- ⏱️ **Tiempo de desarrollo:** Aproximadamente 8 horas
-- 🎨 **Arquitectura:** Hexagonal/Clean Architecture para máxima escalabilidad
-- 🔐 **Seguridad:** JWT, bcrypt, validación de inputs, guards por roles
-- ✅ **Testing:** Cobertura de casos críticos
-- 📚 **Documentación:** Swagger completo y README detallado
+- **Tiempo de desarrollo:** Aproximadamente 8 horas
+- **Arquitectura:** Hexagonal/Clean Architecture para máxima escalabilidad
+- **Seguridad:** JWT, bcrypt, validación de inputs, guards por roles
+- **Testing:** Cobertura de casos críticos
+- **Documentación:** Swagger completo y README detallado
 
-## 📄 Licencia
+## Autor
 
-Este proyecto es parte de una prueba técnica para Conexa.
-
-## 👤 Autor
-
-Desarrollado como parte del reto técnico de Backend SSR para Conexa.
+Victor Bravo Garcia
 
 ---
 
