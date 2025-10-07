@@ -1,160 +1,117 @@
-process.env.PORT = '3000';
-process.env.DATABASE_SSL = 'false';
-process.env.SYNCHRONIZE = 'false';
-process.env.XRAY_DAEMON_ADDRESS = 'http://xray-daemon.local';
-process.env.NODE_ENV = 'development';
-process.env.OPENSEARCH_LOG_LEVEL = 'debug';
-process.env.URL_FILES = 'http://localhost/files';
-process.env.API_CRM = 'http://localhost/crm';
-process.env.URL_REGISTRAR_CASO_AUTOGESTIONABLE = 'http://localhost/registrar';
-process.env.API_KEY = 'some-api-key';
-process.env.URL_ACTUALIZAR_CASO_AUTOGESTIONABLE = 'http://localhost/actualizar';
-process.env.APOLO_SSL = 'false';
-process.env.SOAP_BASE = 'http://localhost/soap';
-process.env.SOAP_ALUMNO_SANCIONADO = 'http://localhost/soap/alumno-sancionado';
-process.env.SOAP_ES_REINCORPORADO_PS = 'http://localhost/soap/reincorporado-ps';
-process.env.SOAP_CARRERA_REINCORPORADO =
-  'http://localhost/soap/carrera-reincorporado';
-process.env.SOAP_REVERSION_CARGO = 'http://localhost/soap/reversion-cargo';
-process.env.SOAP_LVF_CARGOS_ALUMNO = 'http://localhost/soap/lvf-cargos-alumno';
-process.env.SECRET_ACCESS = JSON.stringify({
-  'BDAPOLO.HOST': 'host',
-  'BDAPOLO.PORT': '5432',
-  'BDAPOLO.USER': 'user',
-  'BDAPOLO.PASSWORD': 'password',
-  'BDAPOLO.NAME': 'bdname',
-  'BDTRAMITES.HOST': 'host',
-  'BDTRAMITES.PORT': '5432',
-  'BDTRAMITES.USER': 'user',
-  'BDTRAMITES.PASSWORD': 'password',
-  'BDTRAMITES.NAME': 'bdname',
-});
 import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { AllExceptionFilter } from '../exception.filter';
-import { LoggerService } from 'src/infrastructure/config/logger/logger.service';
+import { LoggerService } from '../../../infrastructure/config/logger/logger.service';
 
 describe('AllExceptionFilter', () => {
-  let exceptionFilter: AllExceptionFilter;
-  let mockLoggerService: jest.Mocked<LoggerService>;
-  let mockArgumentsHost: jest.Mocked<ArgumentsHost>;
-  let mockRequest: any;
+  let filter: AllExceptionFilter;
+  let mockLogger: jest.Mocked<LoggerService>;
   let mockResponse: any;
-  let mockJson: jest.Mock;
-  let mockStatus: jest.Mock;
-  let mockDate: Date;
+  let mockRequest: any;
+  let mockHost: jest.Mocked<ArgumentsHost>;
 
   beforeEach(() => {
-    mockJson = jest.fn().mockReturnThis();
-    mockStatus = jest.fn().mockReturnValue({ json: mockJson });
-    mockRequest = {
-      url: '/test-url',
-    };
+    mockLogger = {
+      log: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    } as any;
+
     mockResponse = {
-      status: mockStatus,
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
     };
 
-    mockLoggerService = {
-      Error: jest.fn(),
-    } as unknown as jest.Mocked<LoggerService>;
+    mockRequest = {
+      url: '/test/url',
+      method: 'GET',
+    };
 
-    mockArgumentsHost = {
+    mockHost = {
       switchToHttp: jest.fn().mockReturnValue({
         getResponse: () => mockResponse,
         getRequest: () => mockRequest,
       }),
-    } as unknown as jest.Mocked<ArgumentsHost>;
+    } as any;
 
-    mockDate = new Date('2024-01-01T00:00:00.000Z');
-    jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
-
-    exceptionFilter = new AllExceptionFilter(mockLoggerService);
+    filter = new AllExceptionFilter(mockLogger);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('catch', () => {
-    it('debería manejar HttpException con mensaje de string', () => {
-      const exception = new HttpException(
-        'Error de prueba',
-        HttpStatus.BAD_REQUEST,
-      );
+  // Test 1: Manejo de HttpException
+  it('debería manejar correctamente una HttpException', () => {
+    const exception = new HttpException(
+      'Unauthorized',
+      HttpStatus.UNAUTHORIZED,
+    );
 
-      exceptionFilter.catch(exception, mockArgumentsHost);
+    filter.catch(exception, mockHost);
 
-      expect(mockStatus).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-      expect(mockJson).toHaveBeenCalledWith({
-        status: HttpStatus.BAD_REQUEST,
-        datetime: mockDate.toISOString(),
-        path: '/test-url',
-        message: 'Error de prueba',
-      });
-      expect(mockLoggerService.Error).toHaveBeenCalledWith(
-        mockRequest,
-        { statusCode: HttpStatus.BAD_REQUEST },
-        { code: 'ERROR', message: 'Error de prueba' },
-      );
-    });
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'GET /test/url → Unauthorized (Status: 401)',
+      exception.stack,
+      'AllExceptionFilter',
+    );
 
-    it('debería manejar HttpException con mensaje en objeto', () => {
-      const exception = new HttpException(
-        { message: 'Error en objeto' },
-        HttpStatus.BAD_REQUEST,
-      );
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 401,
+        message: 'Unauthorized',
+        path: '/test/url',
+        method: 'GET',
+      }),
+    );
+  });
 
-      exceptionFilter.catch(exception, mockArgumentsHost);
+  // Test 2: Manejo de excepción genérica (no HttpException)
+  it('debería manejar correctamente una excepción genérica', () => {
+    const exception = new Error('Unexpected failure');
 
-      expect(mockStatus).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-      expect(mockJson).toHaveBeenCalledWith({
-        status: HttpStatus.BAD_REQUEST,
-        datetime: mockDate.toISOString(),
-        path: '/test-url',
-        message: 'Error en objeto',
-      });
-    });
+    filter.catch(exception, mockHost);
 
-    it('debería manejar excepciones genéricas con Internal Server Error', () => {
-      const exception = new Error('Error genérico');
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'GET /test/url → Internal Server Error (Status: 500)',
+      exception.stack,
+      'AllExceptionFilter',
+    );
 
-      exceptionFilter.catch(exception, mockArgumentsHost);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 500,
+        message: 'Internal Server Error',
+      }),
+    );
+  });
 
-      expect(mockStatus).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-      expect(mockJson).toHaveBeenCalledWith({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        datetime: mockDate.toISOString(),
-        path: '/test-url',
-        message: 'Error genérico',
-      });
-    });
+  // Test 3: HttpException con objeto response
+  it('debería manejar un HttpException con objeto de respuesta', () => {
+    const exception = new HttpException(
+      { message: ['Campo requerido', 'Email inválido'] },
+      HttpStatus.BAD_REQUEST,
+    );
 
-    it('debería manejar HttpException sin mensaje en objeto de respuesta', () => {
-      const exception = new HttpException({}, HttpStatus.BAD_REQUEST);
+    filter.catch(exception, mockHost);
 
-      exceptionFilter.catch(exception, mockArgumentsHost);
+    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Campo requerido, Email inválido',
+      }),
+    );
+  });
 
-      expect(mockStatus).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-      expect(mockJson).toHaveBeenCalledWith({
-        status: HttpStatus.BAD_REQUEST,
-        datetime: mockDate.toISOString(),
-        path: '/test-url',
-        message: 'Http Exception',
-      });
-    });
+  // Test 4: Verifica método privado extractMessage()
+  it('debería extraer correctamente el mensaje del HttpException', () => {
+    const exception = new HttpException(
+      { message: ['Campo requerido', 'Contraseña inválida'] },
+      HttpStatus.BAD_REQUEST,
+    );
 
-    it('debería registrar el error utilizando el LoggerService', () => {
-      const exception = new HttpException(
-        'Error de logging',
-        HttpStatus.BAD_REQUEST,
-      );
-
-      exceptionFilter.catch(exception, mockArgumentsHost);
-
-      expect(mockLoggerService.Error).toHaveBeenCalledWith(
-        mockRequest,
-        { statusCode: HttpStatus.BAD_REQUEST },
-        { code: 'ERROR', message: 'Error de logging' },
-      );
-    });
+    const message = filter['extractMessage'](exception);
+    expect(message).toBe('Campo requerido, Contraseña inválida');
   });
 });

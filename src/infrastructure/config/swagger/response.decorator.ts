@@ -1,6 +1,6 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
-import { ResponseFormat } from 'src/interfaces/interceptors/response.interceptor';
+import { ResponseFormat } from '../../../interfaces/interceptors/response.interceptor';
 
 export const ApiResponseType = <TModel extends Type<any>>(
   model: TModel,
