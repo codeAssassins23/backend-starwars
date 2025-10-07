@@ -11,4 +11,5 @@ export interface IEnviroments {
     synchronize: boolean;
   };
   swapiApiUrl: string;
+  jwtSecret: string;
 }

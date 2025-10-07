@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtServiceAdapter } from '../adapters/jwt/jwt.service.adapter';
 import { BcryptServiceAdapter } from './encryption/bcrypt.service.adapter';
+import { envs } from '../config/environments/envs';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secret_key',
+      secret: envs.jwtSecret || 'secret_key',
       signOptions: { expiresIn: '1h' },
     }),
   ],
