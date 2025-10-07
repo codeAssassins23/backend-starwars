@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { TOKENS } from 'src/domain/tokens/tokens';
-import { Movie } from 'src/domain/entities/movie.entity';
-import type { MovieRepositoryPort } from 'src/domain/ports/repository/movie.repository.port';
-import type { SwapiServicePort } from 'src/domain/ports/external_services/get-movies.swapi';
+import { TOKENS } from '../../../domain/tokens/tokens';
+import { Movie } from '../../../domain/entities/movie.entity';
+import type { MovieRepositoryPort } from '../../../domain/ports/repository/movie.repository.port';
+import type { SwapiServicePort } from '../../../domain/ports/external_services/get-movies.swapi';
 
 @Injectable()
 export class SyncMoviesUseCase {

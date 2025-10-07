@@ -13,4 +13,7 @@ export class UserEntity {
 
   @Column({ default: 'user' })
   role: string;
+
+  @Column({ default: true })
+  status: boolean;
 }

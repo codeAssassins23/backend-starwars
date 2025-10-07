@@ -14,6 +14,9 @@ export class MovieEntity {
   @Column()
   producer: string;
 
+  @Column({ default: true })
+  status: boolean;
+
   @Column({ name: 'release_date' })
   releaseDate: string;
 }
