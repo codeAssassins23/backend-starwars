@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { MovieRepositoryPort } from 'src/domain/ports/repository/movie.repository.port';
-import { TOKENS } from 'src/domain/tokens/tokens';
+import type { MovieRepositoryPort } from '../../../domain/ports/repository/movie.repository.port';
+import { TOKENS } from '../../../domain/tokens/tokens';
 
 @Injectable()
 export class GetMoviesUseCase {
@@ -10,6 +10,6 @@ export class GetMoviesUseCase {
   ) {}
 
   async execute() {
-    return this.movieRepo.findAll();
+    return await this.movieRepo.findAll();
   }
 }

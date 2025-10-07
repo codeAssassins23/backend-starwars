@@ -6,6 +6,10 @@ export const TOKENS = {
   ENCRYPTION_SERVICE: 'EncryptionServicePort',
   MOVIE_REPOSITORY: 'MovieRepositoryPort',
   GET_MOVIES_USE_CASE: 'GetMoviesUseCase',
+  GET_MOVIE_USE_CASE: 'GetMovieUseCase',
+  CREATE_MOVIE_USE_CASE: 'CreateMovieUseCase',
+  UPDATE_MOVIE_USE_CASE: 'UpdateMovieUseCase',
+  DELETE_MOVIE_USE_CASE: 'DeleteMovieUseCase',
   SYNC_MOVIES_USE_CASE: 'SyncMoviesUseCase',
   SWAPI_SERVICE: 'SwapiService',
 };

@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { LoggerService } from 'src/infrastructure/config/logger/logger.service';
+import { LoggerService } from '../../infrastructure/config/logger/logger.service';
 
 export class ResponseFormat<T> {
   data: T;
