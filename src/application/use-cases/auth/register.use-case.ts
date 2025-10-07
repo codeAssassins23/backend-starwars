@@ -18,7 +18,7 @@ export class RegisterUseCase {
     if (existing) throw new ConflictException('User already exists');
 
     const hashed = await this.encryptionService.hash(password);
-    const newUser = new User(0, username, hashed, 'admin');
+    const newUser = new User(0, username, hashed, 'user');
     const saved = await this.userRepo.create(newUser);
     return saved.toSafeUser();
   }
