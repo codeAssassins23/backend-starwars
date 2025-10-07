@@ -106,21 +106,17 @@ PORT=3000
 NODE_ENV=development
 
 # Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=tu_password
-DB_NAME=movies_db
+SECRET_ACCESS={"BDCONEXARETO.HOST":"your-database-host","BDCONEXARETO.PORT":"5432","BDCONEXARETO.USER":"your-username","BDCONEXARETO.PASSWORD":"your-password","BDCONEXARETO.NAME":"your-database-name"}
+DATABASE_SSL=false
+SYNCHRONIZE=true
+
 
 # JWT
-JWT_SECRET=tu_secret_super_seguro_aqui
-JWT_EXPIRATION=1d
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 
 # SWAPI
-SWAPI_BASE_URL=https://www.swapi.tech/api
+SWAPI_API_URL=https://www.swapi.tech/api
 
-# Cron (opcional)
-ENABLE_CRON=true
 ```
 
 4. **Crear la base de datos**
