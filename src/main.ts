@@ -8,9 +8,20 @@ import {
   ResponseIterceptor,
 } from './interfaces/interceptors/response.interceptor';
 import { AllExceptionFilter } from './interfaces/filter/exception.filter';
+import helmet from 'helmet';
+import { getEnvConfig } from './infrastructure/config/environments/envs';
 
 async function bootstrap() {
+  const envs = await getEnvConfig();
   const app = await NestFactory.create(AppModule);
+
+  app.use(helmet());
+
+  app.enableCors({
+    origin: ['https://frontend-conexa.vercel.app', 'http://localhost:4200'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -37,6 +48,6 @@ async function bootstrap() {
   });
 
   SwaggerModule.setup('api', app, document);
-  await app.listen(process.env.PORT ?? 8080);
+  await app.listen(envs.port);
 }
 bootstrap();

@@ -2,13 +2,18 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtServiceAdapter } from '../adapters/jwt/jwt.service.adapter';
 import { BcryptServiceAdapter } from './encryption/bcrypt.service.adapter';
-import { envs } from '../config/environments/envs';
+import { getEnvConfig } from '../config/environments/envs';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: envs.jwtSecret || 'secret_key',
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      useFactory: async () => {
+        const envs = await getEnvConfig();
+        return {
+          secret: envs.jwtSecret,
+          signOptions: { expiresIn: '1h' },
+        };
+      },
     }),
   ],
   providers: [JwtServiceAdapter, BcryptServiceAdapter],

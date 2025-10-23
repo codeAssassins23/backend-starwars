@@ -8,7 +8,9 @@ import { RegisterResponsePresenter } from './presenters/register.presenter';
 import { ApiResponseType } from 'src/infrastructure/config/swagger/response.decorator';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle({ default: true, movie: true })
 @Controller('auth')
 @ApiExtraModels(LoginResponsePresenter, RegisterResponsePresenter)
 export class AuthController {

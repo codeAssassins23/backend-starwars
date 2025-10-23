@@ -1,77 +1,100 @@
 import 'dotenv/config';
 import * as joi from 'joi';
 import { IEnviroments } from 'src/domain/interfaces/enviroments.interface';
+import { loadSecrets } from './env.loader';
 
-interface EnvVars {
-  PORT: number;
-  DATABASE_SSL: boolean;
-  SYNCHRONIZE: boolean;
-  NODE_ENV: string;
-  SECRET_ACCESS: string;
-  SWAPI_API_URL: string;
-  JWT_SECRET: string;
+let secretsCache: { SECRET_ACCESS: string; JWT_SECRET: string } | null = null;
+
+async function getCachedSecrets() {
+  if (!secretsCache) {
+    secretsCache = await loadSecrets();
+    console.log(' Secrets cargados y almacenados en memoria');
+  }
+  return secretsCache;
 }
 
-const envsSchema = joi
-  .object({
-    PORT: joi.number().required(),
-    DATABASE_SSL: joi.boolean().required(),
-    SYNCHRONIZE: joi.boolean().required(),
-    NODE_ENV: joi.string().required(),
-    SECRET_ACCESS: joi.string().required(),
-    SWAPI_API_URL: joi.string().required(),
-    JWT_SECRET: joi.string().required(),
-  })
-  .unknown(true);
+export async function getEnvConfig(): Promise<IEnviroments> {
+  const baseSchema = joi
+    .object({
+      PORT: joi.number().required(),
+      DATABASE_SSL: joi.boolean().required(),
+      SYNCHRONIZE: joi.boolean().required(),
+      NODE_ENV: joi.string().required(),
+      SWAPI_API_URL: joi.string().uri().required(),
+    })
+    .unknown(true);
 
-const { error, value } = envsSchema.validate(process.env);
-
-if (error) {
-  throw new Error(`Config validation error: ${error.message}`);
-}
-
-const envVars: EnvVars = value;
-
-let secretAccessConfig: { [key: string]: string } = {};
-try {
-  secretAccessConfig = JSON.parse(envVars.SECRET_ACCESS);
-} catch (jsonError) {
-  throw new Error(
-    'La variable SECRET_ACCESS no es un JSON válido. Por favor, revisa el formato.',
+  const { error: baseError, value: baseVars } = baseSchema.validate(
+    process.env,
   );
+  if (baseError)
+    throw new Error(`Base config validation error: ${baseError.message}`);
+
+  const secrets = await getCachedSecrets();
+
+  if (!secrets.SECRET_ACCESS || !secrets.JWT_SECRET)
+    throw new Error('SECRET_ACCESS o JWT_SECRET no encontrados');
+
+  let secretAccess: Record<string, string>;
+  try {
+    secretAccess = JSON.parse(secrets.SECRET_ACCESS);
+  } catch {
+    throw new Error('SECRET_ACCESS no es un JSON válido');
+  }
+
+  const secretSchema = joi
+    .object({
+      'BDCONEXARETO.HOST': joi.string().required(),
+      'BDCONEXARETO.PORT': joi.string().required(),
+      'BDCONEXARETO.USER': joi.string().required(),
+      'BDCONEXARETO.PASSWORD': joi.string().required(),
+      'BDCONEXARETO.NAME': joi.string().required(),
+    })
+    .unknown(true);
+
+  const { error: secretError, value: secretValid } =
+    secretSchema.validate(secretAccess);
+
+  if (secretError)
+    throw new Error(`SECRET_ACCESS validation error: ${secretError.message}`);
+
+  return {
+    port: baseVars.PORT,
+    nodeEnv: baseVars.NODE_ENV,
+    database: {
+      host: secretValid['BDCONEXARETO.HOST'],
+      port: Number(secretValid['BDCONEXARETO.PORT']),
+      user: secretValid['BDCONEXARETO.USER'],
+      password: secretValid['BDCONEXARETO.PASSWORD'],
+      name: secretValid['BDCONEXARETO.NAME'],
+      ssl: baseVars.DATABASE_SSL,
+      synchronize: baseVars.SYNCHRONIZE,
+    },
+    swapiApiUrl: baseVars.SWAPI_API_URL,
+    jwtSecret: secrets.JWT_SECRET,
+  };
 }
 
-const secretAccessSchema = joi
-  .object({
-    'BDCONEXARETO.HOST': joi.string().required(),
-    'BDCONEXARETO.PORT': joi.string().required(),
-    'BDCONEXARETO.USER': joi.string().required(),
-    'BDCONEXARETO.PASSWORD': joi.string().required(),
-    'BDCONEXARETO.NAME': joi.string().required(),
-  })
-  .unknown(true);
+export function getEnvSync(): IEnviroments {
+  if (!secretsCache) {
+    throw new Error(
+      'Los secretos aún no están cargados. Llama primero a await getEnvConfig() en main.ts',
+    );
+  }
 
-const { error: secretAccessError, value: secretAccessValidated } =
-  secretAccessSchema.validate(secretAccessConfig);
-
-if (secretAccessError) {
-  throw new Error(
-    `SECRET_ACCESS validation error: ${secretAccessError.message}`,
-  );
+  return {
+    port: Number(process.env.PORT),
+    nodeEnv: process.env.NODE_ENV || 'development',
+    database: {
+      host: JSON.parse(secretsCache.SECRET_ACCESS)['BDCONEXARETO.HOST'],
+      port: Number(JSON.parse(secretsCache.SECRET_ACCESS)['BDCONEXARETO.PORT']),
+      user: JSON.parse(secretsCache.SECRET_ACCESS)['BDCONEXARETO.USER'],
+      password: JSON.parse(secretsCache.SECRET_ACCESS)['BDCONEXARETO.PASSWORD'],
+      name: JSON.parse(secretsCache.SECRET_ACCESS)['BDCONEXARETO.NAME'],
+      ssl: process.env.DATABASE_SSL === 'true',
+      synchronize: process.env.SYNCHRONIZE === 'true',
+    },
+    swapiApiUrl: process.env.SWAPI_API_URL || '',
+    jwtSecret: secretsCache.JWT_SECRET,
+  };
 }
-
-export const envs: IEnviroments = {
-  port: envVars.PORT,
-  nodeEnv: envVars.NODE_ENV,
-  database: {
-    host: secretAccessValidated['BDCONEXARETO.HOST'],
-    port: Number(secretAccessValidated['BDCONEXARETO.PORT']),
-    user: secretAccessValidated['BDCONEXARETO.USER'],
-    password: secretAccessValidated['BDCONEXARETO.PASSWORD'],
-    name: secretAccessValidated['BDCONEXARETO.NAME'],
-    ssl: envVars.DATABASE_SSL,
-    synchronize: envVars.SYNCHRONIZE,
-  },
-  swapiApiUrl: envVars.SWAPI_API_URL,
-  jwtSecret: envVars.JWT_SECRET,
-};

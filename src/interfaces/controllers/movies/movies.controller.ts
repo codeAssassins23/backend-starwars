@@ -25,7 +25,9 @@ import { CreateMovieUseCase } from '../../../application/use-cases/movies/create
 import { UpdateMovieUseCase } from '../../../application/use-cases/movies/update-movie.usecase';
 import { DeleteMovieUseCase } from '../../../application/use-cases/movies/delete-movie.usecase';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle({ default: true, auth: true })
 @Controller('movies')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiExtraModels(MovieResponsePresenter, MoviesResponsePresenter)

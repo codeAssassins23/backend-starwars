@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { Movie } from '../../../domain/entities/movie.entity';
 import { SwapiServicePort } from '../../../domain/ports/external_services/get-movies.swapi';
-import { envs } from '../../../infrastructure/config/environments/envs';
+import { getEnvSync } from '../../../infrastructure/config/environments/envs';
 
 @Injectable()
 export class SwapiService implements SwapiServicePort {
-  private readonly baseUrl = envs.swapiApiUrl;
+  private readonly baseUrl = getEnvSync().swapiApiUrl;
 
   async getMovies(): Promise<Movie[]> {
     try {
