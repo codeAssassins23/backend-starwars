@@ -1,0 +1,66 @@
+name: Deploy to AWS Elastic Beanstalk (QA & PROD)
+
+on:
+  push:
+    branches:
+      - qa
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  EB_APP_NAME: backend-starwars
+
+jobs:
+  deploy:
+    name: Build & Deploy to Elastic Beanstalk
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test --if-present
+
+      - name: Build app
+        run: npm run build
+
+      - name: Build Docker image
+        run: docker build -t starwars-api .
+
+      - name: Prepare Elastic Beanstalk bundle
+        run: zip -r deploy.zip . -x "*.git*" "node_modules/*" "dist/*"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Determine target environment
+        id: set-env
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "qa" ]]; then
+            echo "env_name=backend-starwars-qa" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "env_name=backend-starwars-prod" >> $GITHUB_OUTPUT
+          else
+            echo " Unknown branch. Aborting."
+            exit 1
+          fi
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          pip install awsebcli --upgrade
+          eb init "${{ env.EB_APP_NAME }}" --region "${{ env.AWS_REGION }}" --platform "Docker running on 64bit Amazon Linux 2023"
+          eb use "${{ steps.set-env.outputs.env_name }}"
+          eb deploy
