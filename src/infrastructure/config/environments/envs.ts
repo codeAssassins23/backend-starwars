@@ -18,10 +18,7 @@ export async function getEnvConfig(): Promise<IEnviroments> {
     .object({
       PORT: joi.number().required(),
       DATABASE_SSL: joi.boolean().required(),
-      LOG_LEVEL: joi
-        .string()
-        .valid('info', 'debug', 'warn', 'error')
-        .required(),
+      LOG_LEVEL: joi.string().default('info'),
       SYNCHRONIZE: joi.boolean().required(),
       NODE_ENV: joi.string().required(),
       SWAPI_API_URL: joi.string().uri().required(),

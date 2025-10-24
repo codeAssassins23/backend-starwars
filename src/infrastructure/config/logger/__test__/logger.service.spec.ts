@@ -1,5 +1,22 @@
 import { Logger } from '@nestjs/common';
 import { LoggerService } from '../logger.service';
+jest.mock('../../../infrastructure/config/environments/envs', () => ({
+  getEnvSync: jest.fn().mockReturnValue({
+    port: 3000,
+    nodeEnv: 'test',
+    database: {
+      host: 'localhost',
+      port: 5432,
+      user: 'test',
+      password: 'test',
+      name: 'testdb',
+      ssl: false,
+      synchronize: false,
+    },
+    swapiApiUrl: 'https://swapi.dev/api',
+    jwtSecret: 'mock-secret',
+  }),
+}));
 
 describe('LoggerService', () => {
   let service: LoggerService;

@@ -5,7 +5,7 @@ import { LoggerService } from '../../../infrastructure/config/logger/logger.serv
 import { ResilienceService } from '../../common/resilience/resilience.service';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CronExecution } from 'src/infrastructure/persistence/entities/cron-execution.entity';
+import { CronExecution } from '../../../infrastructure/persistence/entities/cron-execution.entity';
 
 @Injectable()
 export class MovieSyncCron {
