@@ -37,7 +37,11 @@ describe('AuthController', () => {
   // Test: register
   it('debería registrar un nuevo usuario correctamente', async () => {
     const body = { username: 'user1', password: 'pass123' };
-    const expectedResult = { id: 1, username: 'user1', role: 'user' as 'user' };
+    const expectedResult = {
+      id: 1,
+      username: 'user1',
+      message: 'Usuario registrado exitosamente.',
+    } as any;
 
     registerUseCase.execute.mockResolvedValue(expectedResult);
 

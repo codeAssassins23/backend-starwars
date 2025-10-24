@@ -5,7 +5,7 @@ import { TOKENS } from '../../../domain/tokens/tokens';
 import { ApiExtraModels } from '@nestjs/swagger';
 import { LoginResponsePresenter } from './presenters/login.presenter';
 import { RegisterResponsePresenter } from './presenters/register.presenter';
-import { ApiResponseType } from 'src/infrastructure/config/swagger/response.decorator';
+import { ApiResponseType } from '../../../infrastructure/config/swagger/response.decorator';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { SkipThrottle } from '@nestjs/throttler';

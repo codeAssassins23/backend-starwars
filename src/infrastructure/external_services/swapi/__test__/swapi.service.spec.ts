@@ -1,8 +1,13 @@
 import axios from 'axios';
-import { envs } from '../../../../infrastructure/config/environments/envs';
+import { getEnvSync } from '../../../../infrastructure/config/environments/envs';
 import { SwapiService } from '../update-movies.swapi';
 
 jest.mock('axios');
+jest.mock('../../../../infrastructure/config/environments/envs', () => ({
+  getEnvSync: jest.fn().mockReturnValue({
+    swapiApiUrl: 'https://www.swapi.tech/api',
+  }),
+}));
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('SwapiService', () => {
@@ -11,7 +16,6 @@ describe('SwapiService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     service = new SwapiService();
-    (envs as any).swapiApiUrl = 'https://www.swapi.tech/api';
   });
 
   // Caso 1: llamada exitosa a SWAPI
