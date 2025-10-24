@@ -30,11 +30,12 @@ export class AllExceptionFilter implements ExceptionFilter {
     const method = request.method;
     const timestamp = new Date().toISOString();
 
-    this.logger.error(
-      `${method} ${path} → ${message} (Status: ${status})`,
-      exception instanceof Error ? exception.stack : undefined,
-      'AllExceptionFilter',
-    );
+    const errorData = {
+      code: 'ERROR',
+      message: message,
+    };
+
+    this.logger.Error(request, { statusCode: status }, errorData);
 
     // Respuesta uniforme al cliente
     const responseData = {

@@ -1,6 +1,7 @@
 export interface IEnviroments {
   port: number;
   nodeEnv: string;
+  logLevel: string;
   database: {
     host: string;
     port: number;

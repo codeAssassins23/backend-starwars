@@ -1,30 +1,28 @@
 export interface ILogger {
   /**
-   * Log general de información.
-   * @param message Mensaje principal del log.
-   * @param context Contexto opcional del log (ej. nombre del módulo o clase).
+   * Logs generales (uso global en app, cron, guards, etc.)
    */
   log(message: string, context?: string): void;
-
-  /**
-   * Log de advertencia (warning).
-   * @param message Mensaje principal del log.
-   * @param context Contexto opcional del log.
-   */
-  warn(message: string, context?: string): void;
-
-  /**
-   * Log de error.
-   * @param message Mensaje principal del log.
-   * @param trace Traza opcional del error (stack trace).
-   * @param context Contexto opcional del log.
-   */
   error(message: string, trace?: string, context?: string): void;
+  warn(message: string, context?: string): void;
+  debug(message: string, context?: string): void;
 
   /**
-   * Log de depuración (debug).
-   * @param message Mensaje principal del log.
-   * @param context Contexto opcional del log.
+   * Logs específicos de flujo HTTP
    */
-  debug(message: string, context?: string): void;
+  logRequest(req: any, additionalFields?: Partial<Record<string, any>>): void;
+
+  Response(
+    req: any,
+    res: any,
+    body: any,
+    additionalFields?: Partial<Record<string, any>>,
+  ): void;
+
+  Error(
+    req: any,
+    res: any,
+    error: any,
+    additionalFields?: Partial<Record<string, any>>,
+  ): void;
 }

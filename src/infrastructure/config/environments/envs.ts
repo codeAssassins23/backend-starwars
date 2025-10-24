@@ -18,6 +18,10 @@ export async function getEnvConfig(): Promise<IEnviroments> {
     .object({
       PORT: joi.number().required(),
       DATABASE_SSL: joi.boolean().required(),
+      LOG_LEVEL: joi
+        .string()
+        .valid('info', 'debug', 'warn', 'error')
+        .required(),
       SYNCHRONIZE: joi.boolean().required(),
       NODE_ENV: joi.string().required(),
       SWAPI_API_URL: joi.string().uri().required(),
@@ -61,6 +65,7 @@ export async function getEnvConfig(): Promise<IEnviroments> {
   return {
     port: baseVars.PORT,
     nodeEnv: baseVars.NODE_ENV,
+    logLevel: baseVars.logLevel || 'info',
     database: {
       host: secretValid['BDCONEXARETO.HOST'],
       port: Number(secretValid['BDCONEXARETO.PORT']),
@@ -84,6 +89,7 @@ export function getEnvSync(): IEnviroments {
 
   return {
     port: Number(process.env.PORT),
+    logLevel: process.env.LOG_LEVEL || 'info',
     nodeEnv: process.env.NODE_ENV || 'development',
     database: {
       host: JSON.parse(secretsCache.SECRET_ACCESS)['BDCONEXARETO.HOST'],

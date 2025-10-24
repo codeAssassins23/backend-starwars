@@ -22,13 +22,11 @@ export class ResponseIterceptor<T>
     next: CallHandler<T>,
   ): Observable<ResponseFormat<T>> {
     const httpContext = context.switchToHttp();
+    const request = httpContext.getRequest();
     const response = httpContext.getResponse();
     return next.handle().pipe(
       map((data) => {
-        this.loggerService.log(
-          'Data: ' + JSON.stringify(data),
-          'ResponseInterceptor',
-        );
+        this.loggerService.Response(request, response, data);
         return {
           data,
         };
